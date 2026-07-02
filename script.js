@@ -38,14 +38,14 @@
     counter.textContent = `${placedCount} / ${TOTAL_CANDLES} candles on cake`;
   }
 
-  function getPositionsOnCake(index) {
-    const cols = 6;
-    const row = Math.floor(index / cols);
-    const col = index % cols;
-    const x = 18 + col * 32;
-    const y = row * 8;
-    return { x, y };
-  }
+function getPositionsOnCake(index) {
+  const cols = 9;
+  const row = Math.floor(index / cols);
+  const col = index % cols;
+  const x = 6 + col * 24;
+  const y = row * 22;
+  return { x, y };
+}
 
   function isOverCake(clientX, clientY) {
     const rect = cakeArea.getBoundingClientRect();
