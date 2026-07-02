@@ -38,14 +38,14 @@
     counter.textContent = `${placedCount} / ${TOTAL_CANDLES} candles on cake`;
   }
 
-function getPositionsOnCake(index) {
-  const cols = 9;
-  const row = Math.floor(index / cols);
-  const col = index % cols;
-  const x = 6 + col * 24;
-  const y = row * 22;
-  return { x, y };
-}
+  function getPositionsOnCake(index) {
+    const cols = 9;
+    const row = Math.floor(index / cols);
+    const col = index % cols;
+    const x = 6 + col * 24;
+    const y = row * 22;
+    return { x, y };
+  }
 
   function isOverCake(clientX, clientY) {
     const rect = cakeArea.getBoundingClientRect();
@@ -57,11 +57,25 @@ function getPositionsOnCake(index) {
     );
   }
 
+  function resetCandleStyle(candle) {
+    candle.style.position = '';
+    candle.style.left = '';
+    candle.style.top = '';
+    candle.style.zIndex = '';
+  }
+
+  function returnToTray(candle) {
+    candle.classList.remove('dragging');
+    resetCandleStyle(candle);
+    candlesTray.appendChild(candle);
+  }
+
   function placeOnCake(candle) {
     if (candle.classList.contains('on-cake')) return;
 
     candle.classList.remove('dragging');
     candle.classList.add('on-cake');
+    resetCandleStyle(candle);
 
     const pos = getPositionsOnCake(placedCount);
     candle.style.left = pos.x + 'px';
@@ -90,22 +104,26 @@ function getPositionsOnCake(index) {
     }, 1800);
   }
 
+  function cancelDrag() {
+    if (!dragState) return;
+    const candle = dragState.candle;
+    cakeArea.classList.remove('highlight');
+    returnToTray(candle);
+    dragState = null;
+  }
+
   function attachDrag(candle) {
     const onStart = (clientX, clientY) => {
       if (candle.classList.contains('on-cake')) return;
+      if (dragState) return; // already dragging something
+
+      const rect = candle.getBoundingClientRect();
 
       dragState = {
         candle,
-        startX: clientX,
-        startY: clientY,
-        offsetX: 0,
-        offsetY: 0,
-        moved: false,
+        offsetX: clientX - rect.left - rect.width / 2,
+        offsetY: clientY - rect.top - rect.height / 2,
       };
-
-      const rect = candle.getBoundingClientRect();
-      dragState.offsetX = clientX - rect.left - rect.width / 2;
-      dragState.offsetY = clientY - rect.top - rect.height / 2;
 
       candle.classList.add('dragging');
       document.body.appendChild(candle);
@@ -119,7 +137,6 @@ function getPositionsOnCake(index) {
     const onMove = (clientX, clientY) => {
       if (!dragState || dragState.candle !== candle) return;
 
-      dragState.moved = true;
       candle.style.left = (clientX - dragState.offsetX - 7) + 'px';
       candle.style.top = (clientY - dragState.offsetY - 22) + 'px';
 
@@ -137,17 +154,10 @@ function getPositionsOnCake(index) {
       candle.classList.remove('dragging');
 
       if (isOverCake(clientX, clientY)) {
-        candle.style.position = '';
-        candle.style.left = '';
-        candle.style.top = '';
-        candle.style.zIndex = '';
+        resetCandleStyle(candle);
         placeOnCake(candle);
       } else {
-        candlesTray.appendChild(candle);
-        candle.style.position = '';
-        candle.style.left = '';
-        candle.style.top = '';
-        candle.style.zIndex = '';
+        returnToTray(candle);
       }
 
       dragState = null;
@@ -163,29 +173,41 @@ function getPositionsOnCake(index) {
       const t = e.touches[0];
       onStart(t.clientX, t.clientY);
     }, { passive: false });
+
+    // store handlers on candle so global listeners can call them
+    candle._onMove = onMove;
+    candle._onEnd = onEnd;
   }
 
   document.addEventListener('mousemove', (e) => {
-    if (dragState) onMove(e.clientX, e.clientY);
+    if (dragState) dragState.candle._onMove(e.clientX, e.clientY);
   });
 
   document.addEventListener('mouseup', (e) => {
-    if (dragState) onEnd(e.clientX, e.clientY);
+    if (dragState) dragState.candle._onEnd(e.clientX, e.clientY);
   });
 
   document.addEventListener('touchmove', (e) => {
     if (dragState) {
       e.preventDefault();
       const t = e.touches[0];
-      onMove(t.clientX, t.clientY);
+      dragState.candle._onMove(t.clientX, t.clientY);
     }
   }, { passive: false });
 
   document.addEventListener('touchend', (e) => {
     if (dragState) {
       const t = e.changedTouches[0];
-      onEnd(t.clientX, t.clientY);
+      dragState.candle._onEnd(t.clientX, t.clientY);
     }
+  });
+
+  document.addEventListener('touchcancel', () => {
+    cancelDrag();
+  });
+
+  window.addEventListener('blur', () => {
+    cancelDrag();
   });
 
   function switchPhase(fromId, toId) {
