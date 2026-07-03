@@ -38,18 +38,24 @@
     counter.textContent = `${placedCount} / ${TOTAL_CANDLES} candles on cake`;
   }
 
-  // Arrange candles evenly around an ellipse matching the oval cake top,
-  // so all 18 are spread out and visible instead of overlapping.
-  function getPositionsOnCake(index) {
-    const total = TOTAL_CANDLES;
-    const angle = (index / total) * Math.PI * 2 - Math.PI / 2;
-    const centerX = 108;
-    const centerY = 38;
-    const radiusX = 92;
-    const radiusY = 26;
-    const x = centerX + radiusX * Math.cos(angle);
-    const y = centerY + radiusY * Math.sin(angle);
-    return { x: x - 7, y: y - 44 };
+  // Elliptical zone (in px, local to #candles-on-cake's own box) representing
+  // the cake's top surface. Candles can be dropped anywhere inside it; drops
+  // near the edge get pulled to the nearest point on the ellipse so they
+  // never end up floating off the cake.
+  const SURFACE_ELLIPSE = { cx: 85, cy: 24, rx: 74, ry: 19 };
+
+  function clampToSurface(localX, localY) {
+    const dx = localX - SURFACE_ELLIPSE.cx;
+    const dy = localY - SURFACE_ELLIPSE.cy;
+    const norm = Math.sqrt(
+      (dx * dx) / (SURFACE_ELLIPSE.rx * SURFACE_ELLIPSE.rx) +
+      (dy * dy) / (SURFACE_ELLIPSE.ry * SURFACE_ELLIPSE.ry)
+    );
+    if (norm <= 1 || norm === 0) return { x: localX, y: localY };
+    return {
+      x: SURFACE_ELLIPSE.cx + dx / norm,
+      y: SURFACE_ELLIPSE.cy + dy / norm,
+    };
   }
 
   function isOverCake(clientX, clientY) {
@@ -75,18 +81,22 @@
     candlesTray.appendChild(candle);
   }
 
-  function placeOnCake(candle) {
+  function placeOnCake(candle, clientX, clientY) {
     if (candle.classList.contains('on-cake')) return;
 
     candle.classList.remove('dragging');
     candle.classList.add('on-cake');
     resetCandleStyle(candle);
-
-    const pos = getPositionsOnCake(placedCount);
-    candle.style.left = pos.x + 'px';
-    candle.style.top = pos.y + 'px';
-
     candlesOnCake.appendChild(candle);
+
+    const rect = candlesOnCake.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const localY = clientY - rect.top;
+    const pos = clampToSurface(localX, localY);
+
+    candle.style.left = (pos.x - 7) + 'px';
+    candle.style.top = (pos.y - 44) + 'px';
+
     placedCount++;
     updateCounter();
 
@@ -159,8 +169,7 @@
       candle.classList.remove('dragging');
 
       if (isOverCake(clientX, clientY)) {
-        resetCandleStyle(candle);
-        placeOnCake(candle);
+        placeOnCake(candle, clientX, clientY);
       } else {
         returnToTray(candle);
       }
