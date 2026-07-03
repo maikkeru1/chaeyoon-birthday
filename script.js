@@ -38,13 +38,18 @@
     counter.textContent = `${placedCount} / ${TOTAL_CANDLES} candles on cake`;
   }
 
+  // Arrange candles evenly around an ellipse matching the oval cake top,
+  // so all 18 are spread out and visible instead of overlapping.
   function getPositionsOnCake(index) {
-    const cols = 9;
-    const row = Math.floor(index / cols);
-    const col = index % cols;
-    const x = 6 + col * 24;
-    const y = row * 22;
-    return { x, y };
+    const total = TOTAL_CANDLES;
+    const angle = (index / total) * Math.PI * 2 - Math.PI / 2;
+    const centerX = 108;
+    const centerY = 38;
+    const radiusX = 92;
+    const radiusY = 26;
+    const x = centerX + radiusX * Math.cos(angle);
+    const y = centerY + radiusY * Math.sin(angle);
+    return { x: x - 7, y: y - 44 };
   }
 
   function isOverCake(clientX, clientY) {
