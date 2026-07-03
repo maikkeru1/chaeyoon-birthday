@@ -83,6 +83,12 @@
       { icon: 3, size: 20, top: '44%', left: '2px', rot: 14, dur: 5.4, delay: 0.2 },
       { icon: 1, size: 20, top: '36%', right: '2px', rot: -12, dur: 4.8, delay: 0.6 },
     ]);
+    scatterStickers('deco-gallery', [
+      { icon: 0, size: 26, top: '6px', left: '4px', rot: -6, dur: 4.6 },
+      { icon: 2, size: 26, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
+      { icon: 3, size: 22, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
+      { icon: 1, size: 22, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
+    ]);
     scatterStickers('deco-notebook-closed', [
       { icon: 2, size: 34, top: '10px', left: '6px', rot: -6, dur: 4.4 },
       { icon: 0, size: 34, top: '10px', right: '6px', rot: 8, dur: 4.8, delay: 0.5 },
@@ -118,15 +124,15 @@
   const TOTAL_CANDLES = 18;
   const candlesTray = document.getElementById('candles-tray');
   const candlesOnCake = document.getElementById('candles-on-cake');
-  const cakeArea = document.getElementById('cake-area');
   const counter = document.getElementById('candle-counter');
+  const btnPlaceCandles = document.getElementById('btn-place-candles');
   const btnContinue = document.getElementById('btn-continue');
+  const btnGalleryContinue = document.getElementById('btn-gallery-continue');
   const btnOpen = document.getElementById('btn-open');
   const birthdayBanner = document.getElementById('birthday-banner');
   const floatingHearts = document.getElementById('floating-hearts');
 
   let placedCount = 0;
-  let dragState = null;
 
   function createCandle(id) {
     const el = document.createElement('div');
@@ -142,9 +148,7 @@
 
   function initCandles() {
     for (let i = 0; i < TOTAL_CANDLES; i++) {
-      const candle = createCandle(i);
-      candlesTray.appendChild(candle);
-      attachDrag(candle);
+      candlesTray.appendChild(createCandle(i));
     }
   }
 
@@ -152,113 +156,31 @@
     counter.textContent = `${placedCount} / ${TOTAL_CANDLES} candles on cake`;
   }
 
-  // Elliptical zone (in px, local to #candles-on-cake's own box) representing
-  // the cake's top surface. Candles can be dropped anywhere inside it; drops
-  // near the edge get pulled to the nearest point on the ellipse so they
-  // never end up floating off the cake.
+  // The cake's top surface, as an ellipse in px local to #candles-on-cake's
+  // own box. Target points for the auto-placement are laid out inside it as
+  // two concentric rings so the finished cake always looks even.
   const SURFACE_ELLIPSE = { cx: 107, cy: 37, rx: 93, ry: 29 };
 
-  // Minimum allowed distance (px) between candle base points so lit candles
-  // never visually overlap or stack on top of one another.
-  const MIN_CANDLE_DIST = 17;
+  function candlePositions(count) {
+    const outerCount = Math.ceil((count * 2) / 3);
+    const innerCount = count - outerCount;
+    const points = [];
 
-  function clampToSurface(localX, localY) {
-    const dx = localX - SURFACE_ELLIPSE.cx;
-    const dy = localY - SURFACE_ELLIPSE.cy;
-    const norm = Math.sqrt(
-      (dx * dx) / (SURFACE_ELLIPSE.rx * SURFACE_ELLIPSE.rx) +
-      (dy * dy) / (SURFACE_ELLIPSE.ry * SURFACE_ELLIPSE.ry)
-    );
-    if (norm <= 1 || norm === 0) return { x: localX, y: localY };
-    return {
-      x: SURFACE_ELLIPSE.cx + dx / norm,
-      y: SURFACE_ELLIPSE.cy + dy / norm,
-    };
-  }
-
-  function isFree(x, y, existing) {
-    return existing.every((o) => {
-      const dx = x - o.x;
-      const dy = y - o.y;
-      return (dx * dx + dy * dy) >= MIN_CANDLE_DIST * MIN_CANDLE_DIST;
-    });
-  }
-
-  // Finds a free spot for a new candle near the requested drop point. If the
-  // point itself is already taken, spirals outward (growing radius, all
-  // angles) around it — restricted to the cake surface — until a spot far
-  // enough from every existing candle is found. A pure "push away from
-  // neighbors" approach can make several candles converge on the same
-  // equilibrium point when many are clustered together, which is exactly the
-  // stacking bug this feature exists to prevent, so we search instead.
-  function resolveCollisions(x, y, candle) {
-    const existing = Array.from(candlesOnCake.querySelectorAll('.candle.on-cake'))
-      .filter((c) => c !== candle)
-      .map((c) => ({ x: parseFloat(c.style.left) + 7, y: parseFloat(c.style.top) + 44 }));
-
-    const start = clampToSurface(x, y);
-    if (isFree(start.x, start.y, existing)) return start;
-
-    const angleStep = (Math.PI * 2) / 12;
-    for (let radius = MIN_CANDLE_DIST; radius <= 260; radius += MIN_CANDLE_DIST * 0.6) {
-      for (let a = 0; a < 12; a++) {
-        const angle = a * angleStep;
-        const cand = clampToSurface(
-          x + Math.cos(angle) * radius,
-          y + Math.sin(angle) * radius
-        );
-        if (isFree(cand.x, cand.y, existing)) return cand;
-      }
+    for (let i = 0; i < outerCount; i++) {
+      const angle = (Math.PI * 2 * i) / outerCount;
+      points.push({
+        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx * 0.88 + (Math.random() - 0.5) * 6,
+        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry * 0.88 + (Math.random() - 0.5) * 4,
+      });
     }
-    return start;
-  }
-
-  function isOverCake(clientX, clientY) {
-    const rect = cakeArea.getBoundingClientRect();
-    return (
-      clientX >= rect.left &&
-      clientX <= rect.right &&
-      clientY >= rect.top &&
-      clientY <= rect.bottom
-    );
-  }
-
-  function resetCandleStyle(candle) {
-    candle.style.position = '';
-    candle.style.left = '';
-    candle.style.top = '';
-    candle.style.zIndex = '';
-  }
-
-  function returnToTray(candle) {
-    candle.classList.remove('dragging');
-    resetCandleStyle(candle);
-    candlesTray.appendChild(candle);
-  }
-
-  function placeOnCake(candle, clientX, clientY) {
-    if (candle.classList.contains('on-cake')) return;
-
-    candle.classList.remove('dragging');
-    candle.classList.add('on-cake');
-    resetCandleStyle(candle);
-    candlesOnCake.appendChild(candle);
-
-    const rect = candlesOnCake.getBoundingClientRect();
-    const localX = clientX - rect.left;
-    const localY = clientY - rect.top;
-    const clamped = clampToSurface(localX, localY);
-    const pos = resolveCollisions(clamped.x, clamped.y, candle);
-
-    candle.style.left = (pos.x - 7) + 'px';
-    candle.style.top = (pos.y - 44) + 'px';
-
-    placedCount++;
-    updateCounter();
-
-    if (placedCount === TOTAL_CANDLES) {
-      onAllCandlesPlaced();
+    for (let i = 0; i < innerCount; i++) {
+      const angle = (Math.PI * 2 * i) / innerCount + Math.PI / innerCount;
+      points.push({
+        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx * 0.42 + (Math.random() - 0.5) * 6,
+        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry * 0.42 + (Math.random() - 0.5) * 4,
+      });
     }
+    return points;
   }
 
   function onAllCandlesPlaced() {
@@ -268,121 +190,69 @@
       document.querySelectorAll('.candle.on-cake').forEach((c, i) => {
         setTimeout(() => c.classList.add('lit'), i * 80);
       });
-    }, 400);
+    }, 1600);
 
     setTimeout(() => {
       burstConfetti();
-    }, 1200);
+    }, 2600);
 
     setTimeout(() => {
       btnContinue.classList.remove('hidden');
-    }, 1800);
+    }, 3200);
   }
 
-  function cancelDrag() {
-    if (!dragState) return;
-    const candle = dragState.candle;
-    cakeArea.classList.remove('highlight');
-    returnToTray(candle);
-    dragState = null;
-  }
+  // Flies a candle from its tray spot to its target cake spot using a
+  // transform-only animation (translate/scale/rotate), so the browser can
+  // run it off the main thread. The candle is placed at its final resting
+  // left/top immediately, then animated in from an offset equal to where it
+  // started — with a raised midpoint keyframe so the path arcs instead of
+  // cutting a straight line.
+  function flyCandleToCake(candle, startRect, target, delay) {
+    candle.classList.add('on-cake');
+    candlesOnCake.appendChild(candle);
+    candle.style.left = (target.x - 7) + 'px';
+    candle.style.top = (target.y - 44) + 'px';
 
-  function attachDrag(candle) {
-    const onStart = (clientX, clientY) => {
-      if (candle.classList.contains('on-cake')) return;
-      if (dragState) return; // already dragging something
+    const endRect = candle.getBoundingClientRect();
+    const dx = startRect.left - endRect.left;
+    const dy = startRect.top - endRect.top;
+    const rot = (Math.random() - 0.5) * 50;
 
-      const rect = candle.getBoundingClientRect();
-
-      dragState = {
-        candle,
-        offsetX: clientX - rect.left - rect.width / 2,
-        offsetY: clientY - rect.top - rect.height / 2,
-      };
-
-      candle.classList.add('dragging');
-      document.body.appendChild(candle);
-
-      candle.style.position = 'fixed';
-      candle.style.left = (clientX - dragState.offsetX - 7) + 'px';
-      candle.style.top = (clientY - dragState.offsetY - 22) + 'px';
-      candle.style.zIndex = '1000';
-    };
-
-    const onMove = (clientX, clientY) => {
-      if (!dragState || dragState.candle !== candle) return;
-
-      candle.style.left = (clientX - dragState.offsetX - 7) + 'px';
-      candle.style.top = (clientY - dragState.offsetY - 22) + 'px';
-
-      if (isOverCake(clientX, clientY)) {
-        cakeArea.classList.add('highlight');
-      } else {
-        cakeArea.classList.remove('highlight');
-      }
-    };
-
-    const onEnd = (clientX, clientY) => {
-      if (!dragState || dragState.candle !== candle) return;
-
-      cakeArea.classList.remove('highlight');
-      candle.classList.remove('dragging');
-
-      if (isOverCake(clientX, clientY)) {
-        placeOnCake(candle, clientX, clientY);
-      } else {
-        returnToTray(candle);
-      }
-
-      dragState = null;
-    };
-
-    candle.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      onStart(e.clientX, e.clientY);
+    const anim = candle.animate([
+      { transform: `translate(${dx}px, ${dy}px) scale(1.1) rotate(${rot}deg)`, offset: 0 },
+      { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 90}px) scale(1.25) rotate(${rot * 0.3}deg)`, offset: 0.55 },
+      { transform: 'translate(0, 0) scale(0.8) rotate(0deg)', offset: 1 },
+    ], {
+      duration: 850,
+      delay,
+      easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      fill: 'both',
     });
 
-    candle.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const t = e.touches[0];
-      onStart(t.clientX, t.clientY);
-    }, { passive: false });
-
-    // store handlers on candle so global listeners can call them
-    candle._onMove = onMove;
-    candle._onEnd = onEnd;
+    anim.onfinish = () => {
+      candle.style.transform = '';
+      placedCount++;
+      updateCounter();
+      if (placedCount === TOTAL_CANDLES) {
+        onAllCandlesPlaced();
+      }
+    };
   }
 
-  document.addEventListener('mousemove', (e) => {
-    if (dragState) dragState.candle._onMove(e.clientX, e.clientY);
-  });
+  function placeAllCandles() {
+    btnPlaceCandles.classList.add('hidden');
+    document.getElementById('hint-text').textContent = '✨ Here we go! ✨';
 
-  document.addEventListener('mouseup', (e) => {
-    if (dragState) dragState.candle._onEnd(e.clientX, e.clientY);
-  });
+    const candles = Array.from(candlesTray.children);
+    const startRects = candles.map((c) => c.getBoundingClientRect());
+    const targets = candlePositions(candles.length);
 
-  document.addEventListener('touchmove', (e) => {
-    if (dragState) {
-      e.preventDefault();
-      const t = e.touches[0];
-      dragState.candle._onMove(t.clientX, t.clientY);
-    }
-  }, { passive: false });
+    candles.forEach((candle, i) => {
+      flyCandleToCake(candle, startRects[i], targets[i], i * 90);
+    });
+  }
 
-  document.addEventListener('touchend', (e) => {
-    if (dragState) {
-      const t = e.changedTouches[0];
-      dragState.candle._onEnd(t.clientX, t.clientY);
-    }
-  });
-
-  document.addEventListener('touchcancel', () => {
-    cancelDrag();
-  });
-
-  window.addEventListener('blur', () => {
-    cancelDrag();
-  });
+  btnPlaceCandles.addEventListener('click', placeAllCandles);
 
   function switchPhase(fromId, toId) {
     document.getElementById(fromId).classList.remove('active');
@@ -395,8 +265,20 @@
     document.body.appendChild(overlay);
 
     setTimeout(() => {
-      switchPhase('phase-cake', 'phase-notebook-closed');
-      document.querySelector('.flowers-bg').style.display = 'none';
+      switchPhase('phase-cake', 'phase-gallery');
+      overlay.classList.remove('active');
+      setTimeout(() => overlay.remove(), 600);
+      setTimeout(() => btnGalleryContinue.classList.remove('hidden'), 900);
+    }, 700);
+  });
+
+  btnGalleryContinue.addEventListener('click', () => {
+    const overlay = document.createElement('div');
+    overlay.className = 'transition-overlay active';
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+      switchPhase('phase-gallery', 'phase-notebook-closed');
       overlay.classList.remove('active');
       setTimeout(() => overlay.remove(), 600);
       setTimeout(() => btnOpen.classList.remove('hidden'), 1200);
@@ -433,6 +315,56 @@
       setTimeout(() => heart.remove(), 4000);
       count++;
     }, 300);
+  }
+
+  // ---- Intro: bouquets swept in by wind, then the gate question reveals ----
+  function initIntroSweep() {
+    const container = document.getElementById('intro-sweep');
+    const gateContent = document.getElementById('gate-content');
+    if (!container || !gateContent) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      container.remove();
+      gateContent.classList.add('reveal');
+      return;
+    }
+
+    const blooms = ['🌸', '🌷', '🌺', '💐', '🌹', '✨'];
+    const COUNT = 18;
+
+    for (let i = 0; i < COUNT; i++) {
+      const el = document.createElement('span');
+      el.className = 'intro-bloom';
+      el.textContent = blooms[i % blooms.length];
+
+      const size = 1.4 + Math.random() * 1.6;
+      const dx = -(60 + Math.random() * 55);
+      const dy = 50 + Math.random() * 50;
+      const rot = (Math.random() > 0.5 ? 1 : -1) * (120 + Math.random() * 160);
+      const dur = 1.7 + Math.random() * 1.1;
+      const delay = Math.random() * 0.7;
+
+      el.style.setProperty('--b-size', size + 'rem');
+      el.style.setProperty('--b-dx', dx + 'vw');
+      el.style.setProperty('--b-dy', dy + 'vh');
+      el.style.setProperty('--b-rot', rot + 'deg');
+      el.style.setProperty('--b-dur', dur + 's');
+      el.style.setProperty('--b-delay', delay + 's');
+      el.style.top = (Math.random() * 30 - 12) + '%';
+      el.style.right = (Math.random() * 30 - 10) + '%';
+
+      container.appendChild(el);
+    }
+
+    setTimeout(() => {
+      gateContent.classList.add('reveal');
+    }, 1850);
+
+    setTimeout(() => {
+      container.classList.add('done');
+      setTimeout(() => container.remove(), 500);
+    }, 2900);
   }
 
   // ---- Phase 0: love gate with a "No" button that flees the cursor ----
@@ -532,4 +464,5 @@
   updateCounter();
   initStickers();
   initGate();
+  initIntroSweep();
 })();
