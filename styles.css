@@ -14,6 +14,9 @@
   --white: #ffffff;
   --text: #5a2040;
   --shadow: rgba(200, 80, 130, 0.25);
+  --purple: #c9a0f5;
+  --purple-deep: #9b6fd6;
+  --kuromi-dark: #2b2a33;
 }
 
 html, body {
@@ -23,10 +26,21 @@ html, body {
 
 body {
   font-family: 'Quicksand', sans-serif;
-  background: linear-gradient(160deg, #ffd6e8 0%, #ffb8d9 40%, #ffc8e0 70%, #ffe0ef 100%);
+  background: linear-gradient(160deg, #ffd6e8 0%, #ffb8d9 30%, #e9c6fb 55%, #ffc8e0 78%, #ffe0ef 100%);
+  background-size: 220% 220%;
+  animation: bgDrift 18s ease-in-out infinite alternate;
   color: var(--text);
   min-height: 100dvh;
   position: relative;
+}
+
+@keyframes bgDrift {
+  0% { background-position: 0% 30%; }
+  100% { background-position: 100% 70%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body { animation: none; }
 }
 
 /* Flowers background */
@@ -53,10 +67,27 @@ body {
 .f6 { top: 85%; right: 15%; animation-delay: 2.5s; }
 .f7 { top: 30%; right: 20%; animation-delay: 3s; font-size: 1.6rem; }
 .f8 { top: 50%; left: 18%; animation-delay: 1.8s; font-size: 2rem; }
+.f9 { top: 8%; left: 40%; animation-delay: 2.2s; font-size: 1.5rem; opacity: 0.5; }
+.f10 { top: 22%; left: 25%; animation-delay: 0.8s; font-size: 1.2rem; opacity: 0.55; }
+.f11 { top: 68%; right: 30%; animation-delay: 1.2s; font-size: 1.4rem; opacity: 0.5; }
+.f12 { top: 90%; left: 40%; animation-delay: 2.8s; font-size: 1.1rem; opacity: 0.55; }
 
 @keyframes floatFlower {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(8deg); }
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 1rem;
+  opacity: 0;
+  animation: twinkle 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 0.9; transform: scale(1) rotate(25deg); }
 }
 
 /* Phases */
@@ -68,6 +99,7 @@ body {
   padding: 1.2rem 1rem 2rem;
   position: relative;
   z-index: 1;
+  overflow: hidden;
 }
 
 .phase.active {
@@ -85,14 +117,56 @@ body {
   position: absolute;
   width: 70px;
   opacity: 0.85;
+  animation: swayDeco 5s ease-in-out infinite;
 }
 
 .hello-kitty-deco.left { top: 60px; left: 10px; }
-.hello-kitty-deco.right { top: 60px; right: 10px; transform: scaleX(-1); }
+.hello-kitty-deco.right { top: 60px; right: 10px; transform: scaleX(-1); animation-delay: 0.6s; }
+
+@keyframes swayDeco {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(4deg) translateY(-6px); }
+}
+
+.hello-kitty-deco.right {
+  animation-name: swayDecoRight;
+}
+
+@keyframes swayDecoRight {
+  0%, 100% { transform: scaleX(-1) rotate(-4deg) translateY(0); }
+  50% { transform: scaleX(-1) rotate(4deg) translateY(-6px); }
+}
 
 .kitty-svg {
   width: 100%;
   filter: drop-shadow(0 4px 8px var(--shadow));
+}
+
+/* Scattered Kuromi / Hello Kitty sticker doodles */
+.deco-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sticker {
+  position: absolute;
+  width: var(--s-size, 40px);
+  opacity: 0.9;
+  animation: bobSticker var(--s-dur, 4.5s) ease-in-out infinite;
+  animation-delay: var(--s-delay, 0s);
+  transform: rotate(var(--s-rot, 0deg));
+}
+
+.sticker svg {
+  width: 100%;
+  filter: drop-shadow(0 3px 6px var(--shadow));
+}
+
+@keyframes bobSticker {
+  0%, 100% { transform: translateY(0) rotate(var(--s-rot, 0deg)); }
+  50% { transform: translateY(-10px) rotate(calc(var(--s-rot, 0deg) + 6deg)); }
 }
 
 /* Title */
@@ -100,31 +174,47 @@ body {
   font-family: 'Caveat', cursive;
   font-size: clamp(2rem, 7vw, 3rem);
   font-weight: 700;
-  color: var(--pink-hot);
-  text-shadow: 2px 2px 0 #fff, 0 0 20px rgba(255, 105, 180, 0.4);
+  background: linear-gradient(90deg, var(--pink-hot), var(--purple-deep), var(--pink-hot));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmerTitle 4s ease-in-out infinite;
+  filter: drop-shadow(2px 2px 0 #fff) drop-shadow(0 0 16px rgba(255, 105, 180, 0.35));
   margin-top: 0.5rem;
   text-align: center;
   line-height: 1.2;
+}
+
+@keyframes shimmerTitle {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
 }
 
 .hint {
   font-size: clamp(0.85rem, 3.5vw, 1rem);
   text-align: center;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   padding: 0.6rem 1rem;
   border-radius: 20px;
   margin: 0.8rem 0.5rem 0.4rem;
   max-width: 360px;
   line-height: 1.4;
   border: 2px dashed var(--pink-hot);
+  box-shadow: 0 4px 16px var(--shadow);
 }
 
 .counter {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--pink-hot);
   margin-bottom: 0.5rem;
+  padding: 0.15rem 0.9rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
 }
 
 /* Candles tray */
@@ -136,9 +226,13 @@ body {
   max-width: 340px;
   min-height: 80px;
   padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-radius: 16px;
   margin-bottom: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 16px var(--shadow);
 }
 
 /* Candle */
@@ -403,10 +497,11 @@ body {
   border: none;
   border-radius: 30px;
   background: linear-gradient(135deg, #ff69b4, #ff9ec4);
+  background-size: 200% 200%;
   color: white;
   cursor: pointer;
   box-shadow: 0 6px 20px var(--shadow);
-  transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s ease;
+  transition: opacity 0.5s ease, transform 0.2s ease, box-shadow 0.3s ease, background-position 0.6s ease;
   margin-top: 1rem;
   position: relative;
   z-index: 20;
@@ -417,7 +512,7 @@ body {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-  animation: popIn 0.5s ease forwards;
+  animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, pulseGlow 2.4s ease-in-out 0.7s infinite;
 }
 
 .btn-continue:active,
@@ -425,9 +520,23 @@ body {
   transform: scale(0.96);
 }
 
+@media (hover: hover) {
+  .btn-continue:hover,
+  .btn-open:hover {
+    transform: translateY(-2px) scale(1.04);
+    background-position: 100% 100%;
+    box-shadow: 0 10px 26px var(--shadow);
+  }
+}
+
 @keyframes popIn {
-  0% { opacity: 0; transform: translateY(20px) scale(0.9); }
+  0% { opacity: 0; transform: translateY(20px) scale(0.7); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 6px 20px var(--shadow); }
+  50% { box-shadow: 0 6px 28px rgba(255, 105, 180, 0.55), 0 0 0 6px rgba(255, 158, 196, 0.18); }
 }
 
 /* Notebook closed phase */
