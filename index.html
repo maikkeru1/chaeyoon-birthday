@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="vignette" aria-hidden="true"></div>
   <!-- Floating flowers background -->
   <div class="flowers-bg" aria-hidden="true">
     <div class="flower f1">🌸</div>
@@ -24,10 +25,27 @@
     <div class="flower f10">✨</div>
     <div class="flower f11">🎀</div>
     <div class="flower f12">✨</div>
+    <div class="flower f13">🌹</div>
+    <div class="flower f14">🌹</div>
   </div>
 
+  <!-- Phase 0: Love gate -->
+  <section id="phase-gate" class="phase active">
+    <div class="deco-layer" id="deco-gate" aria-hidden="true"></div>
+    <div class="gate-content">
+      <div class="gate-heart-ring"></div>
+      <div class="gate-heart">💗</div>
+      <h1 class="gate-question">Do u love me?</h1>
+      <p class="gate-taunt" id="gate-taunt">&nbsp;</p>
+      <div class="gate-buttons">
+        <button class="btn-yes" id="btn-yes" type="button">Yes 💖</button>
+        <button class="btn-no" id="btn-no" type="button">No</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Phase 1: Cake & Candles -->
-  <section id="phase-cake" class="phase active">
+  <section id="phase-cake" class="phase">
     <div class="deco-layer" id="deco-cake" aria-hidden="true"></div>
     <div class="hello-kitty-deco left" aria-hidden="true">
       <svg viewBox="0 0 120 120" class="kitty-svg">
@@ -154,16 +172,23 @@
 
     <div class="notebook-open" id="notebook-open">
       <div class="notebook-spiral open"></div>
-      <div class="notebook-page">
-        <div class="page-lines"></div>
-        <div class="letter-content" id="letter-content">
-          <p>Happy birthday, my Chaeyoon!</p>
-          <p>Ur 18 today and now ur officially my noona! Ur make me happy everyday. There wasn't a single day when I didn't smile, looking at ur photos, listening to ur gentle voice and reading ur messages.</p>
-          <p>You have become my closest person, to whom I want to give all my love and care. I always want to see ur beautiful and sincere smile, which every time makes me fall in love with you again and again.</p>
-          <p>I hope you received my gift or will receive it soon. I think you'll love it. We'll definitely see each other very, very soon and have a wonderful time together.</p>
-          <p>I love you endlessly and miss you, but I know we have so many adventures ahead of us. My love for you will not be changed by anything, not even distance. I will live with you and we will be happy every day until old age. I promise you.</p>
-          <p>I wish you to always remain the same kind, loving, sweet, and beautiful little princess who loves me immensely and makes me feel good. I love you more than anything, I will always be there</p>
-          <p class="hearts-line">💕 💖 💕 💗 💕 💖 💕 💗 💕</p>
+      <div class="notebook-spread">
+        <div class="notebook-page page-left">
+          <div class="page-lines"></div>
+          <div class="letter-content" id="letter-content-left">
+            <p>Happy birthday, my Chaeyoon!</p>
+            <p>Ur 18 today and now ur officially my noona! Ur make me happy everyday. There wasn't a single day when I didn't smile, looking at ur photos, listening to ur gentle voice and reading ur messages.</p>
+            <p>You have become my closest person, to whom I want to give all my love and care. I always want to see ur beautiful and sincere smile, which every time makes me fall in love with you again and again.</p>
+            <p>I hope you received my gift or will receive it soon. I think you'll love it. We'll definitely see each other very, very soon and have a wonderful time together.</p>
+          </div>
+        </div>
+        <div class="notebook-page page-right">
+          <div class="page-lines"></div>
+          <div class="letter-content" id="letter-content-right">
+            <p>I love you endlessly and miss you, but I know we have so many adventures ahead of us. My love for you will not be changed by anything, not even distance. I will live with you and we will be happy every day until old age. I promise you.</p>
+            <p>I wish you to always remain the same kind, loving, sweet, and beautiful little princess who loves me immensely and makes me feel good. I love you more than anything, I will always be there</p>
+            <p class="hearts-line">💕 💖 💕 💗 💕 💖 💕 💗 💕</p>
+          </div>
         </div>
       </div>
     </div>

@@ -69,6 +69,12 @@
   }
 
   function initStickers() {
+    scatterStickers('deco-gate', [
+      { icon: 2, size: 30, top: '8%', left: '6%', rot: -8, dur: 4.6 },
+      { icon: 0, size: 30, top: '10%', right: '6%', rot: 10, dur: 5, delay: 0.4 },
+      { icon: 1, size: 24, bottom: '14%', left: '8%', rot: 8, dur: 4.2, delay: 0.9 },
+      { icon: 3, size: 24, bottom: '16%', right: '9%', rot: -12, dur: 4.8, delay: 0.2 },
+    ]);
     scatterStickers('deco-cake', [
       { icon: 2, size: 26, top: '4px', left: '4px', rot: -8, dur: 4.2 },
       { icon: 1, size: 24, top: '4px', right: '4px', rot: 10, dur: 5, delay: 0.4 },
@@ -150,7 +156,11 @@
   // the cake's top surface. Candles can be dropped anywhere inside it; drops
   // near the edge get pulled to the nearest point on the ellipse so they
   // never end up floating off the cake.
-  const SURFACE_ELLIPSE = { cx: 85, cy: 24, rx: 74, ry: 19 };
+  const SURFACE_ELLIPSE = { cx: 107, cy: 37, rx: 93, ry: 29 };
+
+  // Minimum allowed distance (px) between candle base points so lit candles
+  // never visually overlap or stack on top of one another.
+  const MIN_CANDLE_DIST = 17;
 
   function clampToSurface(localX, localY) {
     const dx = localX - SURFACE_ELLIPSE.cx;
@@ -164,6 +174,43 @@
       x: SURFACE_ELLIPSE.cx + dx / norm,
       y: SURFACE_ELLIPSE.cy + dy / norm,
     };
+  }
+
+  function isFree(x, y, existing) {
+    return existing.every((o) => {
+      const dx = x - o.x;
+      const dy = y - o.y;
+      return (dx * dx + dy * dy) >= MIN_CANDLE_DIST * MIN_CANDLE_DIST;
+    });
+  }
+
+  // Finds a free spot for a new candle near the requested drop point. If the
+  // point itself is already taken, spirals outward (growing radius, all
+  // angles) around it — restricted to the cake surface — until a spot far
+  // enough from every existing candle is found. A pure "push away from
+  // neighbors" approach can make several candles converge on the same
+  // equilibrium point when many are clustered together, which is exactly the
+  // stacking bug this feature exists to prevent, so we search instead.
+  function resolveCollisions(x, y, candle) {
+    const existing = Array.from(candlesOnCake.querySelectorAll('.candle.on-cake'))
+      .filter((c) => c !== candle)
+      .map((c) => ({ x: parseFloat(c.style.left) + 7, y: parseFloat(c.style.top) + 44 }));
+
+    const start = clampToSurface(x, y);
+    if (isFree(start.x, start.y, existing)) return start;
+
+    const angleStep = (Math.PI * 2) / 12;
+    for (let radius = MIN_CANDLE_DIST; radius <= 260; radius += MIN_CANDLE_DIST * 0.6) {
+      for (let a = 0; a < 12; a++) {
+        const angle = a * angleStep;
+        const cand = clampToSurface(
+          x + Math.cos(angle) * radius,
+          y + Math.sin(angle) * radius
+        );
+        if (isFree(cand.x, cand.y, existing)) return cand;
+      }
+    }
+    return start;
   }
 
   function isOverCake(clientX, clientY) {
@@ -200,7 +247,8 @@
     const rect = candlesOnCake.getBoundingClientRect();
     const localX = clientX - rect.left;
     const localY = clientY - rect.top;
-    const pos = clampToSurface(localX, localY);
+    const clamped = clampToSurface(localX, localY);
+    const pos = resolveCollisions(clamped.x, clamped.y, candle);
 
     candle.style.left = (pos.x - 7) + 'px';
     candle.style.top = (pos.y - 44) + 'px';
@@ -387,7 +435,101 @@
     }, 300);
   }
 
+  // ---- Phase 0: love gate with a "No" button that flees the cursor ----
+  function initGate() {
+    const btnYes = document.getElementById('btn-yes');
+    const btnNo = document.getElementById('btn-no');
+    const taunt = document.getElementById('gate-taunt');
+    if (!btnYes || !btnNo) return;
+
+    const FLEE_RADIUS = 100;
+    const MARGIN = 16;
+    const taunts = [
+      'nice try 😏',
+      'not so fast~',
+      'try again 💗',
+      "it's Yes or Yes",
+      'catch me if u can',
+      'no isn\'t an option 🐰',
+    ];
+    let tauntIndex = 0;
+
+    function flee(fromX, fromY) {
+      const rect = btnNo.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const maxX = window.innerWidth - w - MARGIN;
+      const maxY = window.innerHeight - h - MARGIN;
+
+      let bestX = rect.left;
+      let bestY = rect.top;
+      let bestDist = -1;
+
+      for (let i = 0; i < 12; i++) {
+        const cx = MARGIN + Math.random() * Math.max(1, maxX - MARGIN);
+        const cy = MARGIN + Math.random() * Math.max(1, maxY - MARGIN);
+        const d = Math.hypot(cx + w / 2 - fromX, cy + h / 2 - fromY);
+        if (d > bestDist) {
+          bestDist = d;
+          bestX = cx;
+          bestY = cy;
+        }
+      }
+
+      btnNo.classList.add('fleeing');
+      btnNo.style.left = bestX + 'px';
+      btnNo.style.top = bestY + 'px';
+
+      if (taunt) {
+        taunt.textContent = taunts[tauntIndex % taunts.length];
+        tauntIndex++;
+      }
+    }
+
+    function maybeFlee(x, y) {
+      if (document.getElementById('phase-gate').classList.contains('active') === false) return;
+      const rect = btnNo.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      if (Math.hypot(cx - x, cy - y) < FLEE_RADIUS) {
+        flee(x, y);
+      }
+    }
+
+    document.addEventListener('mousemove', (e) => maybeFlee(e.clientX, e.clientY));
+    document.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (t) maybeFlee(t.clientX, t.clientY);
+    }, { passive: true });
+
+    btnNo.addEventListener('mouseenter', () => {
+      const rect = btnNo.getBoundingClientRect();
+      flee(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+
+    btnNo.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const rect = btnNo.getBoundingClientRect();
+      flee(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }, { passive: false });
+
+    btnYes.addEventListener('click', () => {
+      const overlay = document.createElement('div');
+      overlay.className = 'transition-overlay active';
+      document.body.appendChild(overlay);
+
+      burstConfetti();
+
+      setTimeout(() => {
+        switchPhase('phase-gate', 'phase-cake');
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.remove(), 600);
+      }, 700);
+    });
+  }
+
   initCandles();
   updateCounter();
   initStickers();
+  initGate();
 })();
