@@ -89,6 +89,12 @@
       { icon: 3, size: 22, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
       { icon: 1, size: 22, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
     ]);
+    scatterStickers('deco-game', [
+      { icon: 1, size: 26, top: '6px', left: '4px', rot: -6, dur: 4.6 },
+      { icon: 3, size: 26, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
+      { icon: 0, size: 22, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
+      { icon: 2, size: 22, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
+    ]);
     scatterStickers('deco-notebook-closed', [
       { icon: 2, size: 34, top: '10px', left: '6px', rot: -6, dur: 4.4 },
       { icon: 0, size: 34, top: '10px', right: '6px', rot: 8, dur: 4.8, delay: 0.5 },
@@ -107,8 +113,12 @@
     ]);
   }
 
+  function vibrate(ms) {
+    if (navigator.vibrate) navigator.vibrate(ms || 15);
+  }
+
   function burstConfetti() {
-    const bits = ['💕', '💖', '✨', '🎀', '💗', '⭐'];
+    const bits = ['💕', '💖', '✨', '🎀', '💗', '⭐', '🌸', '🌷'];
     for (let i = 0; i < 16; i++) {
       const bit = document.createElement('span');
       bit.className = 'floating-heart';
@@ -252,7 +262,10 @@
     });
   }
 
-  btnPlaceCandles.addEventListener('click', placeAllCandles);
+  btnPlaceCandles.addEventListener('click', () => {
+    vibrate();
+    placeAllCandles();
+  });
 
   function switchPhase(fromId, toId) {
     document.getElementById(fromId).classList.remove('active');
@@ -260,6 +273,7 @@
   }
 
   btnContinue.addEventListener('click', () => {
+    vibrate();
     const overlay = document.createElement('div');
     overlay.className = 'transition-overlay active';
     document.body.appendChild(overlay);
@@ -273,12 +287,27 @@
   });
 
   btnGalleryContinue.addEventListener('click', () => {
+    vibrate();
     const overlay = document.createElement('div');
     overlay.className = 'transition-overlay active';
     document.body.appendChild(overlay);
 
     setTimeout(() => {
-      switchPhase('phase-gallery', 'phase-notebook-closed');
+      switchPhase('phase-gallery', 'phase-game');
+      overlay.classList.remove('active');
+      setTimeout(() => overlay.remove(), 600);
+    }, 700);
+  });
+
+  const btnGameContinue = document.getElementById('btn-game-continue');
+  btnGameContinue.addEventListener('click', () => {
+    vibrate();
+    const overlay = document.createElement('div');
+    overlay.className = 'transition-overlay active';
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+      switchPhase('phase-game', 'phase-notebook-closed');
       overlay.classList.remove('active');
       setTimeout(() => overlay.remove(), 600);
       setTimeout(() => btnOpen.classList.remove('hidden'), 1200);
@@ -286,6 +315,7 @@
   });
 
   btnOpen.addEventListener('click', () => {
+    vibrate();
     switchPhase('phase-notebook-closed', 'phase-letter');
     startHeartAnimation();
 
@@ -295,6 +325,107 @@
       burstConfetti();
     }, 4000);
   });
+
+  // ---- Mini-game: catch the falling hearts ----
+  function initGame() {
+    const gameArea = document.getElementById('game-area');
+    const btnStartGame = document.getElementById('btn-start-game');
+    const gameCounter = document.getElementById('game-counter');
+    const gameHint = document.getElementById('game-hint');
+    if (!gameArea || !btnStartGame) return;
+
+    const TARGET = 15;
+    const heartsEmoji = ['💕', '💖', '💗', '💝', '❤️', '🩷'];
+    let score = 0;
+    let spawnTimer = null;
+
+    function spawnHeart() {
+      const el = document.createElement('div');
+      el.className = 'game-heart';
+      el.textContent = heartsEmoji[Math.floor(Math.random() * heartsEmoji.length)];
+      el.style.left = (5 + Math.random() * 80) + '%';
+      const dur = 3.2 + Math.random() * 2;
+      el.style.animationDuration = dur + 's';
+
+      const catchHeart = () => {
+        if (el.dataset.done) return;
+        el.dataset.done = '1';
+        vibrate(10);
+        el.classList.add('popped');
+        score++;
+        gameCounter.textContent = `${score} / ${TARGET} caught`;
+        setTimeout(() => el.remove(), 350);
+        if (score >= TARGET) endGame();
+      };
+
+      el.addEventListener('pointerdown', catchHeart);
+      el.addEventListener('animationend', (e) => {
+        if (e.animationName === 'fallHeart') el.remove();
+      });
+
+      gameArea.appendChild(el);
+    }
+
+    function endGame() {
+      clearInterval(spawnTimer);
+      gameArea.querySelectorAll('.game-heart').forEach((h) => h.remove());
+      gameHint.textContent = '🎉 You caught them all! 🎉';
+      burstConfetti();
+      setTimeout(() => btnGameContinue.classList.remove('hidden'), 900);
+    }
+
+    btnStartGame.addEventListener('click', () => {
+      vibrate();
+      btnStartGame.remove();
+      gameHint.textContent = 'Tap or click the hearts before they land 💕';
+      spawnTimer = setInterval(spawnHeart, 550);
+    });
+  }
+
+  // ---- "Our song" toggle on the gate screen ----
+  function initSong() {
+    const btnSong = document.getElementById('btn-song');
+    const bgAudio = document.getElementById('bg-audio');
+    if (!btnSong || !bgAudio) return;
+
+    btnSong.addEventListener('click', () => {
+      vibrate();
+      if (bgAudio.paused) {
+        bgAudio.play().catch(() => {});
+        btnSong.classList.add('playing');
+        btnSong.setAttribute('aria-pressed', 'true');
+        btnSong.querySelector('.song-icon').textContent = '❚❚';
+      } else {
+        bgAudio.pause();
+        btnSong.classList.remove('playing');
+        btnSong.setAttribute('aria-pressed', 'false');
+        btnSong.querySelector('.song-icon').textContent = '▶';
+      }
+    });
+  }
+
+  // ---- Cursor / touch heart trail, subtle, site-wide ----
+  function initCursorHearts() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const bits = ['💕', '💖', '✨'];
+    let lastTime = 0;
+
+    function spawn(x, y) {
+      const now = Date.now();
+      if (now - lastTime < 140) return;
+      lastTime = now;
+      const h = document.createElement('span');
+      h.className = 'cursor-heart';
+      h.textContent = bits[Math.floor(Math.random() * bits.length)];
+      h.style.left = x + 'px';
+      h.style.top = y + 'px';
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 900);
+    }
+
+    document.addEventListener('pointermove', (e) => spawn(e.clientX, e.clientY));
+  }
 
   function startHeartAnimation() {
     const hearts = ['💕', '💖', '💗', '💝', '❤️', '🩷'];
@@ -446,6 +577,7 @@
     }, { passive: false });
 
     btnYes.addEventListener('click', () => {
+      vibrate();
       const overlay = document.createElement('div');
       overlay.className = 'transition-overlay active';
       document.body.appendChild(overlay);
@@ -465,4 +597,7 @@
   initStickers();
   initGate();
   initIntroSweep();
+  initGame();
+  initSong();
+  initCursorHearts();
 })();

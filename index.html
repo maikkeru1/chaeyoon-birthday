@@ -52,6 +52,12 @@
         <button class="btn-yes" id="btn-yes" type="button">Yes 💖</button>
         <button class="btn-no" id="btn-no" type="button">No</button>
       </div>
+      <button class="btn-song" id="btn-song" type="button" aria-pressed="false">
+        <span class="song-eq" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="song-icon">▶</span>
+        <span>our song</span>
+      </button>
+      <audio id="bg-audio" src="audio/die-for-you.mp3" loop preload="none"></audio>
     </div>
   </section>
 
@@ -204,6 +210,35 @@
     <p class="gallery-footer">we'll see each other soon <span>🤍</span></p>
 
     <button class="btn-continue hidden" id="btn-gallery-continue" type="button">Continue 💕</button>
+  </section>
+
+  <!-- Phase 1.7: Mini-game -->
+  <section id="phase-game" class="phase">
+    <div class="hero-hearts" aria-hidden="true">
+      <span class="hero-heart hh1"></span>
+      <span class="hero-heart hh2"></span>
+      <span class="hero-heart hh3"></span>
+      <span class="hero-heart hh4"></span>
+      <span class="hero-heart hh5"></span>
+      <span class="hero-heart hh6"></span>
+      <span class="hero-heart hh7"></span>
+      <span class="hero-heart hh8"></span>
+      <span class="hero-heart hh9"></span>
+      <span class="hero-heart hh10"></span>
+      <span class="hero-heart hh11"></span>
+      <span class="hero-heart hh12"></span>
+    </div>
+    <div class="deco-layer" id="deco-game" aria-hidden="true"></div>
+    <p class="pill-badge"><span>🎮</span> one more quest</p>
+    <h2 class="gallery-title">Catch my kisses!</h2>
+    <p class="hint" id="game-hint">Tap or click 15 hearts before they fall 💕</p>
+    <p class="counter" id="game-counter">0 / 15 caught</p>
+
+    <div class="game-area" id="game-area">
+      <button class="btn-place-candles" id="btn-start-game" type="button">Start 🎮</button>
+    </div>
+
+    <button class="btn-continue hidden" id="btn-game-continue" type="button">Continue 💕</button>
   </section>
 
   <!-- Phase 2: Notebook closed -->
