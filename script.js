@@ -272,46 +272,45 @@
     document.getElementById(toId).classList.add('active');
   }
 
-  btnContinue.addEventListener('click', () => {
-    vibrate();
+  // Springy circular-wipe transition between phases: an overlay covers the
+  // screen, the phase swap happens at the peak of the cover, then the
+  // overlay uncovers to reveal the new phase.
+  function runPhaseTransition(fromId, toId, afterSwap) {
     const overlay = document.createElement('div');
-    overlay.className = 'transition-overlay active';
+    overlay.className = 'transition-overlay';
+    overlay.innerHTML = '<span class="overlay-heart">💗</span>';
     document.body.appendChild(overlay);
 
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => overlay.classList.add('active'));
+    });
+
     setTimeout(() => {
-      switchPhase('phase-cake', 'phase-gallery');
+      switchPhase(fromId, toId);
+      if (afterSwap) afterSwap();
       overlay.classList.remove('active');
-      setTimeout(() => overlay.remove(), 600);
+      setTimeout(() => overlay.remove(), 700);
+    }, 680);
+  }
+
+  btnContinue.addEventListener('click', () => {
+    vibrate();
+    runPhaseTransition('phase-cake', 'phase-gallery', () => {
       setTimeout(() => btnGalleryContinue.classList.remove('hidden'), 900);
-    }, 700);
+    });
   });
 
   btnGalleryContinue.addEventListener('click', () => {
     vibrate();
-    const overlay = document.createElement('div');
-    overlay.className = 'transition-overlay active';
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-      switchPhase('phase-gallery', 'phase-game');
-      overlay.classList.remove('active');
-      setTimeout(() => overlay.remove(), 600);
-    }, 700);
+    runPhaseTransition('phase-gallery', 'phase-game');
   });
 
   const btnGameContinue = document.getElementById('btn-game-continue');
   btnGameContinue.addEventListener('click', () => {
     vibrate();
-    const overlay = document.createElement('div');
-    overlay.className = 'transition-overlay active';
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-      switchPhase('phase-game', 'phase-notebook-closed');
-      overlay.classList.remove('active');
-      setTimeout(() => overlay.remove(), 600);
+    runPhaseTransition('phase-game', 'phase-notebook-closed', () => {
       setTimeout(() => btnOpen.classList.remove('hidden'), 1200);
-    }, 700);
+    });
   });
 
   btnOpen.addEventListener('click', () => {
@@ -578,17 +577,8 @@
 
     btnYes.addEventListener('click', () => {
       vibrate();
-      const overlay = document.createElement('div');
-      overlay.className = 'transition-overlay active';
-      document.body.appendChild(overlay);
-
       burstConfetti();
-
-      setTimeout(() => {
-        switchPhase('phase-gate', 'phase-cake');
-        overlay.classList.remove('active');
-        setTimeout(() => overlay.remove(), 600);
-      }, 700);
+      runPhaseTransition('phase-gate', 'phase-cake');
     });
   }
 
