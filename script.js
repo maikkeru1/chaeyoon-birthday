@@ -164,8 +164,8 @@
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count - Math.PI / 2;
       points.push({
-        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx + (Math.random() - 0.5) * 4,
-        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry + (Math.random() - 0.5) * 3,
+        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx,
+        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry,
       });
     }
     return points;
