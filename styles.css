@@ -533,6 +533,37 @@ body {
   50% { transform: translateY(-10px) rotate(calc(var(--s-rot, 0deg) + 6deg)); }
 }
 
+/* Ambient kiss marks scattered across the whole page background, behind every phase */
+.kiss-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.kiss-mark {
+  position: absolute;
+  width: var(--k-size, 20px);
+  opacity: var(--k-op, 0.14);
+  transform: rotate(var(--k-rot, 0deg));
+  animation: driftKiss 10s ease-in-out infinite;
+}
+
+.kiss-mark svg {
+  width: 100%;
+  display: block;
+}
+
+@keyframes driftKiss {
+  0%, 100% { transform: rotate(var(--k-rot, 0deg)) translateY(0); }
+  50% { transform: rotate(calc(var(--k-rot, 0deg) + 4deg)) translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiss-mark { animation: none; }
+}
+
 /* Title */
 .main-title {
   font-family: 'Playfair Display', serif;
