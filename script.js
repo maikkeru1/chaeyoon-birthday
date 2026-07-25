@@ -1,58 +1,13 @@
 (function () {
   'use strict';
 
-  // ---- Decorative Hello Kitty & Kuromi stickers ----
-  const SVG_KITTY_FACE = `<svg viewBox="0 0 100 100">
-    <ellipse cx="50" cy="58" rx="38" ry="32" fill="#fff" stroke="#333" stroke-width="2"/>
-    <ellipse cx="21" cy="29" rx="15" ry="18" fill="#fff" stroke="#333" stroke-width="2"/>
-    <ellipse cx="79" cy="29" rx="15" ry="18" fill="#fff" stroke="#333" stroke-width="2"/>
-    <ellipse cx="21" cy="29" rx="8" ry="10" fill="#ffb6c1"/>
-    <ellipse cx="79" cy="29" rx="8" ry="10" fill="#ffb6c1"/>
-    <ellipse cx="40" cy="57" rx="3.4" ry="4.2" fill="#333"/>
-    <ellipse cx="60" cy="57" rx="3.4" ry="4.2" fill="#333"/>
-    <ellipse cx="50" cy="65" rx="4.2" ry="2.5" fill="#ffb6c1"/>
-    <circle cx="35" cy="52" r="5" fill="#ffe0e8" opacity="0.7"/>
-    <circle cx="65" cy="52" r="5" fill="#ffe0e8" opacity="0.7"/>
-    <ellipse cx="50" cy="15" rx="18" ry="11" fill="#ff69b4" stroke="#e05090" stroke-width="1.2"/>
-    <circle cx="50" cy="15" r="4" fill="#fff"/>
-  </svg>`;
-
-  const SVG_KITTY_BOW = `<svg viewBox="0 0 100 100">
-    <path d="M50 50 L15 25 Q5 20 8 35 Q10 48 30 50 Q10 52 8 65 Q5 80 15 75 Z" fill="#ff69b4" stroke="#e05090" stroke-width="2"/>
-    <path d="M50 50 L85 25 Q95 20 92 35 Q90 48 70 50 Q90 52 92 65 Q95 80 85 75 Z" fill="#ff69b4" stroke="#e05090" stroke-width="2"/>
-    <circle cx="50" cy="50" r="9" fill="#fff" stroke="#e05090" stroke-width="2"/>
-  </svg>`;
-
-  const SVG_KUROMI_FACE = `<svg viewBox="0 0 100 100">
-    <ellipse cx="50" cy="58" rx="38" ry="32" fill="#fff" stroke="#2b2a33" stroke-width="2"/>
-    <ellipse cx="17" cy="32" rx="13" ry="20" fill="#2b2a33" transform="rotate(-25 17 32)"/>
-    <ellipse cx="83" cy="32" rx="13" ry="20" fill="#2b2a33" transform="rotate(25 83 32)"/>
-    <circle cx="8" cy="15" r="6" fill="#f582c0"/>
-    <circle cx="92" cy="15" r="6" fill="#f582c0"/>
-    <path d="M18 38 Q50 10 82 38 Q82 24 50 19 Q18 24 18 38 Z" fill="#2b2a33"/>
-    <ellipse cx="40" cy="57" rx="3.8" ry="4.6" fill="#2b2a33"/>
-    <ellipse cx="60" cy="57" rx="3.8" ry="4.6" fill="#2b2a33"/>
-    <ellipse cx="50" cy="66" rx="3" ry="2" fill="#2b2a33"/>
-    <circle cx="35" cy="52" r="5" fill="#f582c0" opacity="0.6"/>
-    <circle cx="65" cy="52" r="5" fill="#f582c0" opacity="0.6"/>
-    <circle cx="50" cy="13" r="7.5" fill="#fff" stroke="#2b2a33" stroke-width="1.4"/>
-    <circle cx="47" cy="12" r="1.4" fill="#2b2a33"/>
-    <circle cx="53" cy="12" r="1.4" fill="#2b2a33"/>
-    <path d="M47 16 Q50 18.5 53 16" stroke="#2b2a33" stroke-width="1.1" fill="none" stroke-linecap="round"/>
-  </svg>`;
-
-  const SVG_KUROMI_STAR = `<svg viewBox="0 0 100 100">
-    <path d="M60 15 A30 30 0 1 0 60 85 A24 24 0 1 1 60 15 Z" fill="#2b2a33"/>
-    <path d="M78 60 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 Z" fill="#f582c0"/>
-    <path d="M25 20 l2.5 5.5 5.5 2.5 -5.5 2.5 -2.5 5.5 -2.5 -5.5 -5.5 -2.5 5.5 -2.5 Z" fill="#c9a0f5"/>
-  </svg>`;
-
-  const IMG_KITTY_BOW_BIG = `<img src="images/hk-bow-big.png" alt="">`;
-  const IMG_KISS_MARK = `<img src="images/kiss-mark.png" alt="">`;
+  // ---- Decorative Hello Kitty stickers (real photos) ----
   const IMG_KITTY_FACE_REAL = `<img src="images/hk-face.png" alt="">`;
+  const IMG_KITTY_BOW_BIG = `<img src="images/hk-bow-big.png" alt="">`;
   const IMG_KITTY_HEART_BALLOONS = `<img src="images/hk-heart-balloons.png" alt="">`;
+  const IMG_KISS_MARK = `<img src="images/kiss-mark.png" alt="">`;
 
-  const STICKERS = [SVG_KITTY_FACE, SVG_KITTY_BOW, SVG_KUROMI_FACE, SVG_KUROMI_STAR, IMG_KITTY_BOW_BIG, IMG_KISS_MARK, IMG_KITTY_FACE_REAL, IMG_KITTY_HEART_BALLOONS];
+  const STICKERS = [IMG_KITTY_FACE_REAL, IMG_KITTY_BOW_BIG, IMG_KITTY_HEART_BALLOONS, IMG_KISS_MARK];
 
   function scatterStickers(containerId, layout) {
     const container = document.getElementById(containerId);
@@ -75,87 +30,74 @@
 
   function initStickers() {
     scatterStickers('deco-gate', [
-      { icon: 2, size: 30, top: '8%', left: '6%', rot: -8, dur: 4.6 },
-      { icon: 0, size: 30, top: '10%', right: '6%', rot: 10, dur: 5, delay: 0.4 },
-      { icon: 4, size: 26, bottom: '14%', left: '8%', rot: 8, dur: 4.2, delay: 0.9 },
-      { icon: 5, size: 22, bottom: '16%', right: '9%', rot: -12, dur: 4.8, delay: 0.2 },
+      { icon: 0, size: 30, top: '8%', left: '6%', rot: -8, dur: 4.6 },
+      { icon: 2, size: 30, top: '10%', right: '6%', rot: 10, dur: 5, delay: 0.4 },
+      { icon: 1, size: 26, bottom: '14%', left: '8%', rot: 8, dur: 4.2, delay: 0.9 },
+      { icon: 3, size: 22, bottom: '16%', right: '9%', rot: -12, dur: 4.8, delay: 0.2 },
     ]);
     scatterStickers('deco-cake', [
-      { icon: 4, size: 28, top: '4px', left: '4px', rot: -8, dur: 4.2 },
-      { icon: 1, size: 24, top: '4px', right: '4px', rot: 10, dur: 5, delay: 0.4 },
-      { icon: 6, size: 30, bottom: '8px', left: '6px', rot: 6, dur: 4.6, delay: 0.8 },
+      { icon: 1, size: 28, top: '4px', left: '4px', rot: -8, dur: 4.2 },
+      { icon: 0, size: 24, top: '4px', right: '4px', rot: 10, dur: 5, delay: 0.4 },
+      { icon: 2, size: 30, bottom: '8px', left: '6px', rot: 6, dur: 4.6, delay: 0.8 },
       { icon: 0, size: 30, bottom: '8px', right: '6px', rot: -10, dur: 4, delay: 1.2 },
-      { icon: 5, size: 18, top: '44%', left: '2px', rot: 14, dur: 5.4, delay: 0.2 },
+      { icon: 3, size: 18, top: '44%', left: '2px', rot: 14, dur: 5.4, delay: 0.2 },
       { icon: 1, size: 20, top: '36%', right: '2px', rot: -12, dur: 4.8, delay: 0.6 },
     ]);
     scatterStickers('deco-gallery', [
       { icon: 0, size: 26, top: '6px', left: '4px', rot: -6, dur: 4.6 },
-      { icon: 4, size: 28, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
-      { icon: 5, size: 20, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
-      { icon: 1, size: 22, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
+      { icon: 1, size: 28, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
+      { icon: 3, size: 20, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
+      { icon: 2, size: 22, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
     ]);
     scatterStickers('deco-game', [
-      { icon: 1, size: 26, top: '6px', left: '4px', rot: -6, dur: 4.6 },
-      { icon: 5, size: 20, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
+      { icon: 2, size: 26, top: '6px', left: '4px', rot: -6, dur: 4.6 },
+      { icon: 3, size: 20, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
       { icon: 0, size: 22, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
-      { icon: 4, size: 28, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
+      { icon: 1, size: 28, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
     ]);
     scatterStickers('deco-notebook-closed', [
-      { icon: 4, size: 36, top: '10px', left: '6px', rot: -6, dur: 4.4 },
+      { icon: 1, size: 36, top: '10px', left: '6px', rot: -6, dur: 4.4 },
       { icon: 0, size: 34, top: '10px', right: '6px', rot: 8, dur: 4.8, delay: 0.5 },
-      { icon: 1, size: 26, bottom: '10px', left: '8px', rot: 10, dur: 4.2, delay: 1 },
-      { icon: 5, size: 24, bottom: '10px', right: '8px', rot: -8, dur: 5, delay: 0.3 },
-      { icon: 3, size: 20, top: '45%', left: '2px', rot: 16, dur: 5.2, delay: 0.7 },
+      { icon: 2, size: 26, bottom: '10px', left: '8px', rot: 10, dur: 4.2, delay: 1 },
+      { icon: 3, size: 24, bottom: '10px', right: '8px', rot: -8, dur: 5, delay: 0.3 },
+      { icon: 0, size: 20, top: '45%', left: '2px', rot: 16, dur: 5.2, delay: 0.7 },
       { icon: 1, size: 20, top: '60%', right: '2px', rot: -14, dur: 4.6, delay: 0.2 },
     ]);
     scatterStickers('deco-letter', [
       { icon: 0, size: 28, top: '6px', left: '4px', rot: -6, dur: 4.6 },
-      { icon: 4, size: 30, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
-      { icon: 5, size: 22, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
-      { icon: 1, size: 24, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
+      { icon: 1, size: 30, top: '6px', right: '4px', rot: 8, dur: 4.2, delay: 0.5 },
+      { icon: 3, size: 22, bottom: '6px', left: '4px', rot: 10, dur: 5, delay: 0.9 },
+      { icon: 2, size: 24, bottom: '6px', right: '4px', rot: -10, dur: 4.4, delay: 0.3 },
       { icon: 1, size: 18, top: '32%', left: '2px', rot: 14, dur: 5.4, delay: 0.6 },
-      { icon: 7, size: 22, top: '52%', right: '2px', rot: -16, dur: 4.8, delay: 0.1 },
+      { icon: 2, size: 22, top: '52%', right: '2px', rot: -16, dur: 4.8, delay: 0.1 },
     ]);
   }
 
-  const KISS_FIELD_SPOTS = [
-    { top: '5%', left: '12%', size: 22, rot: -18, op: 0.16 },
-    { top: '9%', left: '42%', size: 16, rot: 12, op: 0.12 },
-    { top: '4%', right: '18%', size: 26, rot: 22, op: 0.15 },
-    { top: '16%', right: '4%', size: 18, rot: -10, op: 0.14 },
-    { top: '22%', left: '4%', size: 20, rot: 8, op: 0.14 },
-    { top: '30%', left: '26%', size: 15, rot: -14, op: 0.11 },
-    { top: '27%', right: '30%', size: 22, rot: 16, op: 0.15 },
-    { top: '40%', left: '10%', size: 18, rot: 20, op: 0.13 },
-    { top: '38%', right: '8%', size: 24, rot: -12, op: 0.16 },
-    { top: '50%', left: '46%', size: 16, rot: 10, op: 0.12 },
-    { top: '55%', left: '18%', size: 20, rot: -20, op: 0.14 },
-    { top: '58%', right: '20%', size: 18, rot: 14, op: 0.13 },
-    { bottom: '30%', left: '6%', size: 22, rot: 8, op: 0.15 },
-    { bottom: '26%', right: '6%', size: 16, rot: -16, op: 0.12 },
-    { bottom: '18%', left: '34%', size: 20, rot: 18, op: 0.14 },
-    { bottom: '14%', right: '36%', size: 24, rot: -10, op: 0.16 },
-    { bottom: '8%', left: '10%', size: 18, rot: 12, op: 0.13 },
-    { bottom: '6%', right: '12%', size: 20, rot: -18, op: 0.15 },
-    { bottom: '38%', left: '50%', size: 15, rot: 16, op: 0.11 },
-    { bottom: '44%', right: '46%', size: 22, rot: -14, op: 0.14 },
-  ];
-
   function initKissField() {
-    const container = document.getElementById('kiss-field');
-    if (!container) return;
-    KISS_FIELD_SPOTS.forEach((spot) => {
-      const el = document.createElement('div');
-      el.className = 'kiss-mark';
-      el.innerHTML = IMG_KISS_MARK;
-      el.style.setProperty('--k-size', spot.size + 'px');
-      el.style.setProperty('--k-rot', spot.rot + 'deg');
-      el.style.setProperty('--k-op', spot.op);
-      if (spot.top !== undefined) el.style.top = spot.top;
-      if (spot.bottom !== undefined) el.style.bottom = spot.bottom;
-      if (spot.left !== undefined) el.style.left = spot.left;
-      if (spot.right !== undefined) el.style.right = spot.right;
-      container.appendChild(el);
+    const containers = document.querySelectorAll('.kiss-field');
+    const cols = 7;
+    const rows = 10;
+    containers.forEach((container) => {
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const el = document.createElement('div');
+          el.className = 'kiss-mark';
+          el.innerHTML = IMG_KISS_MARK;
+          const jitterX = (Math.random() - 0.5) * (100 / cols) * 0.8;
+          const jitterY = (Math.random() - 0.5) * (100 / rows) * 0.8;
+          const left = ((c + 0.5) / cols) * 100 + jitterX;
+          const top = ((r + 0.5) / rows) * 100 + jitterY;
+          const size = 30 + Math.random() * 26;
+          const rot = Math.random() * 360;
+          const op = 0.32 + Math.random() * 0.22;
+          el.style.setProperty('--k-size', size.toFixed(1) + 'px');
+          el.style.setProperty('--k-rot', rot.toFixed(1) + 'deg');
+          el.style.setProperty('--k-op', op.toFixed(2));
+          el.style.left = left.toFixed(2) + '%';
+          el.style.top = top.toFixed(2) + '%';
+          container.appendChild(el);
+        }
+      }
     });
   }
 
