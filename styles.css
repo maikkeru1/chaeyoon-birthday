@@ -523,8 +523,10 @@ body {
   transform: rotate(var(--s-rot, 0deg));
 }
 
-.sticker svg {
+.sticker svg,
+.sticker img {
   width: 100%;
+  display: block;
   filter: drop-shadow(0 3px 6px var(--shadow));
 }
 
@@ -550,7 +552,8 @@ body {
   animation: driftKiss 10s ease-in-out infinite;
 }
 
-.kiss-mark svg {
+.kiss-mark svg,
+.kiss-mark img {
   width: 100%;
   display: block;
 }
