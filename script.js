@@ -159,14 +159,48 @@
   // Kitty topper baked into the cake photo.
   const SURFACE_ELLIPSE = { cx: 104, cy: 23, rx: 96, ry: 18 };
 
+  // Places points around the ellipse spaced by equal arc length rather than
+  // equal angle. Since rx is much larger than ry, equal-angle spacing bunches
+  // points together at the left/right extremes and spreads them too far
+  // apart at the front/back — equal arc length keeps the ring looking even
+  // all the way around.
   function candlePositions(count) {
+    const { cx, cy, rx, ry } = SURFACE_ELLIPSE;
+    const STEPS = 720;
+    const thetaAt = (s) => (Math.PI * 2 * s) / STEPS;
+    const pointAt = (theta) => ({
+      x: cx + Math.cos(theta) * rx,
+      y: cy + Math.sin(theta) * ry,
+    });
+
+    const cumLen = [0];
+    let prev = pointAt(0);
+    for (let s = 1; s <= STEPS; s++) {
+      const p = pointAt(thetaAt(s));
+      cumLen.push(cumLen[s - 1] + Math.hypot(p.x - prev.x, p.y - prev.y));
+      prev = p;
+    }
+    const total = cumLen[STEPS];
+
+    function thetaAtLength(len) {
+      len = ((len % total) + total) % total;
+      let lo = 0, hi = STEPS;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (cumLen[mid] < len) lo = mid + 1; else hi = mid;
+      }
+      const s1 = Math.max(1, lo);
+      const s0 = s1 - 1;
+      const segLen = cumLen[s1] - cumLen[s0] || 1;
+      const t = (len - cumLen[s0]) / segLen;
+      return thetaAt(s0) + t * (thetaAt(s1) - thetaAt(s0));
+    }
+
+    const startLen = cumLen[Math.round((STEPS * 3) / 4)]; // start at the back (theta = -90deg)
     const points = [];
     for (let i = 0; i < count; i++) {
-      const angle = (Math.PI * 2 * i) / count - Math.PI / 2;
-      points.push({
-        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx,
-        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry,
-      });
+      const theta = thetaAtLength(startLen + (i * total) / count);
+      points.push(pointAt(theta));
     }
     return points;
   }
