@@ -137,9 +137,8 @@
     el.className = 'candle';
     el.dataset.id = id;
     el.innerHTML = `
-      <div class="candle-flame"></div>
-      <div class="candle-wick"></div>
-      <div class="candle-body"></div>
+      <img class="candle-flame" src="images/flame.png" alt="">
+      <img class="candle-body" src="images/candle.png" alt="">
     `;
     return el;
   }
@@ -155,27 +154,18 @@
   }
 
   // The cake's top surface, as an ellipse in px local to #candles-on-cake's
-  // own box. Target points for the auto-placement are laid out inside it as
-  // two concentric rings so the finished cake always looks even.
-  const SURFACE_ELLIPSE = { cx: 107, cy: 37, rx: 93, ry: 29 };
+  // own box. Target points for the auto-placement sit in a single ring
+  // around that ellipse's rim, right on the icing and clear of the Hello
+  // Kitty topper baked into the cake photo.
+  const SURFACE_ELLIPSE = { cx: 73, cy: 24, rx: 80, ry: 22 };
 
   function candlePositions(count) {
-    const outerCount = Math.ceil((count * 2) / 3);
-    const innerCount = count - outerCount;
     const points = [];
-
-    for (let i = 0; i < outerCount; i++) {
-      const angle = (Math.PI * 2 * i) / outerCount;
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count - Math.PI / 2;
       points.push({
-        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx * 0.88 + (Math.random() - 0.5) * 6,
-        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry * 0.88 + (Math.random() - 0.5) * 4,
-      });
-    }
-    for (let i = 0; i < innerCount; i++) {
-      const angle = (Math.PI * 2 * i) / innerCount + Math.PI / innerCount;
-      points.push({
-        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx * 0.42 + (Math.random() - 0.5) * 6,
-        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry * 0.42 + (Math.random() - 0.5) * 4,
+        x: SURFACE_ELLIPSE.cx + Math.cos(angle) * SURFACE_ELLIPSE.rx + (Math.random() - 0.5) * 4,
+        y: SURFACE_ELLIPSE.cy + Math.sin(angle) * SURFACE_ELLIPSE.ry + (Math.random() - 0.5) * 3,
       });
     }
     return points;
@@ -208,8 +198,8 @@
   function flyCandleToCake(candle, startRect, target, delay) {
     candle.classList.add('on-cake');
     candlesOnCake.appendChild(candle);
-    candle.style.left = (target.x - 7) + 'px';
-    candle.style.top = (target.y - 44) + 'px';
+    candle.style.left = (target.x - 9) + 'px';
+    candle.style.top = (target.y - 59) + 'px';
 
     const endRect = candle.getBoundingClientRect();
     const dx = startRect.left - endRect.left;

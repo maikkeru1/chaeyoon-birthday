@@ -616,8 +616,8 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  max-width: 340px;
-  min-height: 80px;
+  max-width: 360px;
+  min-height: 100px;
   padding: 0.5rem;
   background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(6px);
@@ -630,8 +630,8 @@ body {
 
 /* Candle */
 .candle {
-  width: 14px;
-  height: 44px;
+  width: 18px;
+  height: 59px;
   position: relative;
   user-select: none;
   z-index: 10;
@@ -643,44 +643,39 @@ body {
 }
 
 .candle-body {
+  position: absolute;
+  left: 0;
+  bottom: 0;
   width: 100%;
-  height: 36px;
-  background: repeating-linear-gradient(
-    0deg,
-    #fff 0px, #fff 4px,
-    #ff69b4 4px, #ff69b4 8px
-  );
-  border-radius: 2px 2px 0 0;
-  border: 1px solid #e05090;
-}
-
-.candle-wick {
-  width: 2px;
-  height: 6px;
-  background: #555;
-  margin: 0 auto;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 3px 5px rgba(90, 50, 30, 0.3));
 }
 
 .candle-flame {
-  width: 10px;
-  height: 14px;
-  margin: -2px auto 0;
-  background: radial-gradient(ellipse at bottom, #ffdd00 0%, #ff8800 60%, transparent 100%);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 13px;
+  height: auto;
+  margin-bottom: -9px;
+  transform: translateX(-50%) scale(0);
+  transform-origin: bottom center;
   opacity: 0;
-  transform: scale(0);
   transition: opacity 0.4s ease, transform 0.4s ease;
+  filter: drop-shadow(0 0 6px rgba(255, 180, 60, 0.65));
+  pointer-events: none;
 }
 
 .candle.lit .candle-flame {
   opacity: 1;
-  transform: scale(1);
+  transform: translateX(-50%) scale(1);
   animation: flicker 0.8s ease-in-out infinite alternate;
 }
 
 @keyframes flicker {
-  0% { transform: scale(1) rotate(-2deg); opacity: 0.9; }
-  100% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+  0% { transform: translateX(-50%) scale(1) rotate(-2deg); opacity: 0.9; }
+  100% { transform: translateX(-50%) scale(1.08) rotate(2deg); opacity: 1; }
 }
 
 /* Cake */
@@ -692,175 +687,30 @@ body {
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 1rem;
-  perspective: 1100px;
 }
 
 .cake {
   position: relative;
-  width: 350px;
-  height: 290px;
-  transform-style: preserve-3d;
-  transform: rotateX(10deg);
-  transform-origin: center bottom;
+  width: 380px;
+  height: 313px;
 }
 
-/* Plate */
-.cake-plate {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 375px;
-  height: 26px;
-  background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 60%, #ddd 100%);
-  border-radius: 50%;
-  border: 2px solid #ddd;
-  box-shadow: 0 8px 16px var(--shadow), inset 0 2px 4px rgba(255,255,255,0.8);
-}
-
-.cake-plate-shine {
-  position: absolute;
-  bottom: 17px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 225px;
-  height: 7px;
-  background: rgba(255,255,255,0.6);
-  border-radius: 50%;
-  filter: blur(2px);
-}
-
-/* Generic tier body (the cylindrical side of a cake layer) — chocolate sponge */
-.tier-body {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 2px solid #5c3a21;
-  border-top: none;
-  box-shadow:
-    inset -12px 0 18px rgba(50, 25, 10, 0.35),
-    inset 12px 0 18px rgba(255, 220, 190, 0.25),
-    inset 0 -12px 16px rgba(50, 25, 10, 0.3),
-    0 8px 16px rgba(70, 40, 20, 0.3);
-  overflow: hidden;
-}
-
-/* Generic tier cap (the pink icing ellipse on top of a layer) */
-.tier-cap {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  border: 2px solid #e05090;
-  box-shadow: inset 0 -6px 10px rgba(200, 70, 120, 0.25), inset 0 4px 8px rgba(255,255,255,0.7);
-}
-
-/* Frosting drips hanging from a tier's cap edge — pink icing dripping down the chocolate sides */
-.drip {
-  position: absolute;
-  top: 0;
-  width: 18px;
-  margin-left: -9px;
-  border-radius: 0 0 50% 50%;
-  border: 2px solid #e05090;
-  border-top: none;
-}
-
-/* --- Bottom tier --- */
-.tier-bottom-body {
-  bottom: 17px;
-  width: 308px;
-  height: 70px;
-  background: linear-gradient(90deg, #3f2413 0%, #6b4226 12%, #a06a3c 50%, #6b4226 88%, #3f2413 100%);
-  border-radius: 0 0 32px 32px;
-}
-.tier-bottom-body .drip { background: linear-gradient(180deg, #ffd6e8, #ff9ec4); }
-.tier-bottom-cap {
-  bottom: 71px;
-  width: 308px;
-  height: 34px;
-  background: radial-gradient(ellipse at 35% 30%, #fff8fb 0%, #ffd6e8 45%, #ff9ec4 100%);
-}
-
-/* --- Middle tier --- */
-.tier-middle-body {
-  bottom: 84px;
-  width: 258px;
-  height: 60px;
-  background: linear-gradient(90deg, #3f2413 0%, #74492b 12%, #a5713f 50%, #74492b 88%, #3f2413 100%);
-  border-radius: 0 0 27px 27px;
-}
-.tier-middle-body .drip { background: linear-gradient(180deg, #fff0f6, #ffb8d9); }
-.tier-middle-cap {
-  bottom: 131px;
-  width: 258px;
-  height: 30px;
-  background: radial-gradient(ellipse at 35% 30%, #ffffff 0%, #fff0f6 45%, #ffb8d9 100%);
-}
-
-/* --- Crown (top) tier — candle surface, wider oval for a top-down view --- */
-.tier-crown-body {
-  bottom: 144px;
-  width: 214px;
-  height: 50px;
-  background: linear-gradient(90deg, #3f2413 0%, #7b4d2d 12%, #ab7643 50%, #7b4d2d 88%, #3f2413 100%);
-  border-radius: 0 0 24px 24px;
-}
-.tier-crown-cap {
-  bottom: 182px;
-  width: 214px;
-  height: 46px;
-  background: radial-gradient(ellipse at 35% 30%, #fffdfd 0%, #ffe0ef 45%, #ff9ec4 100%);
-  z-index: 3;
-}
-
-/* Sprinkles: a handful of colored dots pressed into the icing */
-.tier-bottom-cap::before,
-.tier-middle-cap::before {
-  content: '';
+.cake-photo {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  background-image:
-    radial-gradient(circle, #ff5c8a 45%, transparent 46%),
-    radial-gradient(circle, #ffd23f 45%, transparent 46%),
-    radial-gradient(circle, #7fd8be 45%, transparent 46%),
-    radial-gradient(circle, #a78bfa 45%, transparent 46%),
-    radial-gradient(circle, #ff5c8a 45%, transparent 46%),
-    radial-gradient(circle, #ffd23f 45%, transparent 46%),
-    radial-gradient(circle, #7fd8be 45%, transparent 46%),
-    radial-gradient(circle, #a78bfa 45%, transparent 46%);
-  background-size: 6px 6px;
-  background-repeat: no-repeat;
-  background-position:
-    18% 30%, 32% 65%, 48% 25%, 60% 60%,
-    72% 35%, 84% 70%, 22% 75%, 90% 40%;
-  opacity: 0.85;
-  pointer-events: none;
-}
-
-.cake-kitty {
-  position: absolute;
-  bottom: 198px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 68px;
-  z-index: 4;
-  pointer-events: none;
-}
-
-.cake-kitty-svg {
   width: 100%;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 14px 22px rgba(90, 50, 30, 0.28));
 }
 
 .candles-on-cake {
   position: absolute;
-  bottom: 176px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 214px;
-  height: 76px;
+  top: 50px;
+  left: 101px;
+  width: 146px;
+  height: 46px;
   z-index: 5;
 }
 
