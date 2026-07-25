@@ -448,41 +448,51 @@
       return;
     }
 
-    const blooms = ['🌸', '🌷', '🌺', '💐', '🌹', '✨'];
-    const COUNT = 18;
+    const blooms = [
+      'images/flower-cosmos-pink.png',
+      'images/flower-daisy-white.png',
+      'images/flower-rose-red.png',
+      'images/flower-anemone-purple.png',
+      'images/flower-rose-purple.png',
+      'images/flower-rose-yellow.png',
+      'images/flower-anemone-teal.png',
+      'images/flower-rose-pink.png',
+    ];
+    const COUNT = 46;
 
     for (let i = 0; i < COUNT; i++) {
-      const el = document.createElement('span');
+      const el = document.createElement('img');
       el.className = 'intro-bloom';
-      el.textContent = blooms[i % blooms.length];
+      el.src = blooms[i % blooms.length];
+      el.alt = '';
 
-      const size = 1.4 + Math.random() * 1.6;
-      const dx = -(60 + Math.random() * 55);
-      const dy = 50 + Math.random() * 50;
-      const rot = (Math.random() > 0.5 ? 1 : -1) * (120 + Math.random() * 160);
-      const dur = 1.7 + Math.random() * 1.1;
-      const delay = Math.random() * 0.7;
+      const size = 90 + Math.random() * 170;
+      const dx = -(70 + Math.random() * 95);
+      const dy = 55 + Math.random() * 75;
+      const rot = (Math.random() > 0.5 ? 1 : -1) * (120 + Math.random() * 200);
+      const dur = 1.9 + Math.random() * 1.3;
+      const delay = Math.random() * 0.9;
 
-      el.style.setProperty('--b-size', size + 'rem');
+      el.style.setProperty('--b-size', size + 'px');
       el.style.setProperty('--b-dx', dx + 'vw');
       el.style.setProperty('--b-dy', dy + 'vh');
       el.style.setProperty('--b-rot', rot + 'deg');
       el.style.setProperty('--b-dur', dur + 's');
       el.style.setProperty('--b-delay', delay + 's');
-      el.style.top = (Math.random() * 30 - 12) + '%';
-      el.style.right = (Math.random() * 30 - 10) + '%';
+      el.style.top = (Math.random() * 70 - 20) + '%';
+      el.style.right = (Math.random() * 90 - 20) + '%';
 
       container.appendChild(el);
     }
 
     setTimeout(() => {
       gateContent.classList.add('reveal');
-    }, 1850);
+    }, 2100);
 
     setTimeout(() => {
       container.classList.add('done');
       setTimeout(() => container.remove(), 500);
-    }, 2900);
+    }, 3300);
   }
 
   // ---- Phase 0: love gate with a "No" button that flees the cursor ----

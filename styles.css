@@ -236,7 +236,9 @@ body {
 
 .intro-bloom {
   position: absolute;
-  font-size: var(--b-size, 2.2rem);
+  width: var(--b-size, 120px);
+  height: auto;
+  display: block;
   opacity: 0;
   animation: introWind var(--b-dur, 2.2s) cubic-bezier(0.25, 0.6, 0.34, 1) var(--b-delay, 0s) forwards;
   filter: drop-shadow(0 4px 10px rgba(120, 70, 70, 0.18));
