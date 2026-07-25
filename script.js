@@ -157,7 +157,7 @@
   // own box. Target points for the auto-placement sit in a single ring
   // around that ellipse's rim, right on the icing and clear of the Hello
   // Kitty topper baked into the cake photo.
-  const SURFACE_ELLIPSE = { cx: 73, cy: 24, rx: 80, ry: 22 };
+  const SURFACE_ELLIPSE = { cx: 73, cy: 24, rx: 80, ry: 7 };
 
   function candlePositions(count) {
     const points = [];
