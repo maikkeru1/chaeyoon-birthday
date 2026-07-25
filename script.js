@@ -157,7 +157,7 @@
   // own box. Target points for the auto-placement sit in a single ring
   // around that ellipse's rim, right on the icing and clear of the Hello
   // Kitty topper baked into the cake photo.
-  const SURFACE_ELLIPSE = { cx: 104, cy: 23, rx: 96, ry: 18 };
+  const SURFACE_ELLIPSE = { cx: 104, cy: 27, rx: 96, ry: 9 };
 
   // Places points around the ellipse spaced by equal arc length rather than
   // equal angle. Since rx is much larger than ry, equal-angle spacing bunches
@@ -196,10 +196,17 @@
       return thetaAt(s0) + t * (thetaAt(s1) - thetaAt(s0));
     }
 
-    const startLen = cumLen[Math.round((STEPS * 3) / 4)]; // start at the back (theta = -90deg)
+    // Leave a gap centered on the back of the ellipse (theta = -90deg) so no
+    // candle lands directly behind the Hello Kitty topper's head, where
+    // there's no visible cake surface for it to stand on.
+    const GAP_DEG = 64;
+    const startS = Math.round(((270 + GAP_DEG / 2) / 360) * STEPS);
+    const startLen = cumLen[startS];
+    const arcSpan = total * (1 - GAP_DEG / 360);
+
     const points = [];
     for (let i = 0; i < count; i++) {
-      const theta = thetaAtLength(startLen + (i * total) / count);
+      const theta = thetaAtLength(startLen + (arcSpan * i) / (count - 1));
       points.push(pointAt(theta));
     }
     return points;
