@@ -75,21 +75,21 @@
 
   function initKissField() {
     const containers = document.querySelectorAll('.kiss-field');
-    const cols = 7;
-    const rows = 10;
+    const cols = 9;
+    const rows = 13;
     containers.forEach((container) => {
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const el = document.createElement('div');
           el.className = 'kiss-mark';
           el.innerHTML = IMG_KISS_MARK;
-          const jitterX = (Math.random() - 0.5) * (100 / cols) * 0.8;
-          const jitterY = (Math.random() - 0.5) * (100 / rows) * 0.8;
+          const jitterX = (Math.random() - 0.5) * (100 / cols) * 0.9;
+          const jitterY = (Math.random() - 0.5) * (100 / rows) * 0.9;
           const left = ((c + 0.5) / cols) * 100 + jitterX;
           const top = ((r + 0.5) / rows) * 100 + jitterY;
-          const size = 30 + Math.random() * 26;
+          const size = 64 + Math.random() * 54;
           const rot = Math.random() * 360;
-          const op = 0.32 + Math.random() * 0.22;
+          const op = 0.36 + Math.random() * 0.24;
           el.style.setProperty('--k-size', size.toFixed(1) + 'px');
           el.style.setProperty('--k-rot', rot.toFixed(1) + 'deg');
           el.style.setProperty('--k-op', op.toFixed(2));
